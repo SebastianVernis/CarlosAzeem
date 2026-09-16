@@ -5,15 +5,27 @@
 A **static website** (no framework): a cinematic, scroll-driven dossier/portfolio
 for "Carlos Azeem Sánchez Alvarado". It is split into three files:
 
-- `index.html` — SEO meta, Tailwind CDN + inline `tailwind.config`, markup and the
-  JSON-LD block.
-- `styles.css` — all custom CSS (formerly the inline `<style>`).
+- `index.html` — SEO meta, markup, JSON-LD block, and a `<noscript>` static fallback
+  with the full content and evidence links.
+- `styles.css` — all custom CSS plus the two hand-written utilities (`z-35`,
+  `contrast-110`) that the old Tailwind CDN generated on the fly.
+- `tailwind.css` — **pre-compiled Tailwind v3** (no runtime CDN). Must be regenerated
+  when utility classes change (see below).
 - `script.js` — the whole animation engine (one IIFE, formerly inline at the end of
   `<body>`).
+- `robots.txt`, `sitemap.xml`, `site.webmanifest` — crawl/PWA plumbing.
+- `assets/` — portrait, Cuarto de Paz logo, favicons (`favicon-16/32`,
+  `apple-touch-icon`, `android-chrome-*`), brand isotipos y logos completos.
 
-There are **no dependencies, no build step, no package manager, no tests, no lint
-config, no CI, and no git repo.** Assets live in `assets/` (portrait + Cuarto de Paz
-logo). All content and code comments are in **Spanish** — keep it that way when editing.
+There are **no dependencies, no build step required to run**. To regenerate
+`tailwind.css` after editing classes in `index.html`/`script.js`:
+
+```bash
+npx tailwindcss@3 -c tailwind.config.js -i input.css -o tailwind.css --minify
+# input.css: solo las 3 directivas @tailwind. El config mapea los tokens
+# (noir, cyanAccent #00f0ff, greenAccent #39ff14, fonts serif/display/sans/mono)
+# y escanea index.html + script.js con plugins forms y container-queries.
+```
 
 ## Running / verifying changes
 
@@ -99,19 +111,19 @@ comes from a `carDirs` array (`[1,0]` derecha, `[0,-1]` arriba, `[-1,0]` izquier
   `handleWheel` always advances `targetProgress` and never hands off to a container.
 - **Class/id coupling between JS and markup.** JS looks up a list of fixed ids.
   Renaming any without updating JS silently disables that behavior.
-- **Tailwind config is inline** (`tailwind.config = {...}`) after the CDN script.
-  Custom tokens: colors `noir`, `cyanAccent` (`#00f0ff`), `greenAccent` (`#39ff14`),
-  `subtleBorder`; fonts `serif`/`display`/`sans`/`mono`. The markup mostly uses
+- **Tailwind tokens** (`tailwind.config.js` in the build environment): colors `noir`,
+  `cyanAccent` (`#00f0ff`), `greenAccent` (`#39ff14`), `subtleBorder`; fonts
+  `serif`/`display`/`sans`/`mono`. The markup mostly uses
   **arbitrary-value classes** (`text-[#00f0ff]`, `bg-[#39ff14]`, `z-35`, `z-30`),
   not those tokens.
-- `z-35` (used on `stage-ejes`, around line 296) is **not** in Tailwind's default
-  z-index scale, so unlike `z-20/30/40/50` it likely has no generated rule. Verify
-  stacking visually before relying on it.
+- `z-35` (used on `stage-ejes`, around line 296) is **hand-written in `styles.css`**
+  (not a Tailwind default; the CDN generated it on the fly, the static build can't).
+  Same for `contrast-110`. If you add new arbitrary classes, recompile `tailwind.css`.
 - **No `prefers-reduced-motion` handling** exists; all motion is unconditional.
 - **Local assets** live in `assets/`: `carlos_azeem.png` (portrait, transparent PNG)
   and `logo_cuarto_paz.png` (firm logo, trimmed of transparent margins; used as the
-  `h2` of `stage-cuarto`). Google Fonts, Material Symbols and the OG/Twitter images
-  are still remote (`lh3.googleusercontent.com`).
+  `h2` of `stage-cuarto`), plus favicons/PWA icons and brand isotipos/logos.
+  Google Fonts and Material Symbols are still remote.
 - The animation engine is a single IIFE in `script.js`, loaded with a plain
   `<script src>` at the end of `<body>`; there are no modules, bundlers, or shared
   globals.

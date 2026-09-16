@@ -152,6 +152,21 @@ body {
 
 
 /* ============================================================
+   Utilidades que el CDN de Tailwind generaba bajo demanda y que
+   el build estático no incluye (fuera del preset por defecto).
+   ============================================================ */
+.z-35 {
+  z-index: 35;
+}
+
+.contrast-110 {
+  --tw-contrast: contrast(1.1);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale)
+    var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia)
+    var(--tw-drop-shadow);
+}
+
+/* ============================================================
    SECTION: IMPACTO (Registro de Medios)
    2-row layout: header top / card stage bottom
    ============================================================ */
